@@ -18,30 +18,30 @@ SoftwareSerial A2A(8, 9); // Initialize Pin 8 and 9 as RX and TX for BotConSeria
 
 //Left Motor
 #define AnalogSpeedLeft 5 // Pin to control the speed of left motor
-#define LeftMotorIN1 11 // Pin to control direction of left motor
-#define LeftMotorIN2 12 // Pin to control direction of left motor
+#define LeftMotorIN1 14 // Pin to control direction of left motor
+#define LeftMotorIN2 15 // Pin to control direction of left motor
 
 //Android Commands to Arduino Micro
-#define Command_Available A2A.available() > 0
-#define Switch_On_Off_Pressed command == 'W'
-#define Car_On TurnOn % 2 == 1
-#define Car_Off TurnOn % 2 == 0
-#define Disconnect_Pressed command == 'Z'
-#define Decrease_Pressed command == 'V'
-#define Increase_Pressed command == 'X'
-#define Forward_Pressed command == 'F'
-#define Reverse_Pressed command == 'B'
-#define Forward_Left_Pressed command == 'G'
-#define Reverse_Left_Pressed command == 'H'
-#define Forward_Right_Pressed command == 'I'
-#define Reverse_Right_Pressed command == 'J'
-#define Left_Rotation_Pressed command == 'L'
-#define Right_Rotation_Pressed command == 'R'
-#define Stop_Pressed command == 'S'
-#define Auto_Pressed command == 'A'
+#define Command_Available (A2A.available() > 0)
+#define Switch_On_Off_Pressed (command == 'W')
+#define Car_On (TurnOn % 2 == 1)
+#define Car_Off (TurnOn % 2 == 0)
+#define Disconnect_Pressed (command == 'Z')
+#define Decrease_Pressed (command == 'V')
+#define Increase_Pressed (command == 'X')
+#define Forward_Pressed (command == 'F')
+#define Reverse_Pressed (command == 'B')
+#define Forward_Left_Pressed (command == 'G')
+#define Reverse_Left_Pressed (command == 'H')
+#define Forward_Right_Pressed (command == 'I')
+#define Reverse_Right_Pressed (command == 'J')
+#define Left_Rotation_Pressed (command == 'L')
+#define Right_Rotation_Pressed (command == 'R')
+#define Stop_Pressed (command == 'S')
+#define Auto_Pressed (command == 'A')
 
 //LED
-#define LightOut 13
+#define LightOut 16
 
 //Time Setting
 unsigned long timesetter;
