@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------------For Declaration----------------------------------------------------------------------------------------------//
 #include <SoftwareSerial.h>
 SoftwareSerial A2A(8, 9); // Initialize Pin 8 and 9 as RX and TX for BotConSerial
-
+  
 //RDM6300
 #define PwrSupply 2
 
@@ -21,7 +21,7 @@ SoftwareSerial A2A(8, 9); // Initialize Pin 8 and 9 as RX and TX for BotConSeria
 #define LeftMotorIN1 14 // Pin to control direction of left motor
 #define LeftMotorIN2 15 // Pin to control direction of left motor
 
-//Android Commands to Arduino Micro
+//Android Commands to Arduino Pro Micro
 #define Command_Available (A2A.available() > 0)
 #define Switch_On_Off_Pressed (command == 'W')
 #define Car_On (TurnOn % 2 == 1)
@@ -38,10 +38,9 @@ SoftwareSerial A2A(8, 9); // Initialize Pin 8 and 9 as RX and TX for BotConSeria
 #define Left_Rotation_Pressed (command == 'L')
 #define Right_Rotation_Pressed (command == 'R')
 #define Stop_Pressed (command == 'S')
-#define Auto_Pressed (command == 'A')
 
 //LED
-#define LightOut 16
+#define LightOut 20
 
 //Time Setting
 unsigned long timesetter;
@@ -54,12 +53,12 @@ int StationCounter = 1;
 char precode[14];
 
 //Speed Control
-int SpdLF = 0; // Set between 0 to 255
-int SpdLR = 0; // Set between 0 to 255
-int SpdRF = 0; // Set between 0 to 255
-int SpdRR = 0; // Set between 0 to 255
+int SpdLF = 0;
+int SpdLR = 0;
+int SpdRF = 0;
+int SpdRR = 0;
 
-boolean Turn = false;
+int Assigned_Speed = 1;
 
 char command;
 int TurnOn = 0;
@@ -67,13 +66,14 @@ int TurnOn = 0;
 //-----------------------------------------------------------------------------Get Commands from Andriod to Arduino-----------------------------------------------------------------------------//
 
 void Get_Command(){
-  if (Command_Available){
+  if (A2A.available() > 0){
     command = A2A.read();
   }
 }
 
 void Armed_Disarmed(){
   TurnOn++;
+  command = 'S';
 }
 
 
@@ -141,10 +141,10 @@ void Left_Forward(int speed) {  //  Turn left motor in forward direction
   digitalWrite(LeftMotorIN1, LOW);
   digitalWrite(LeftMotorIN2, HIGH);
   if (speed <= 255 && speed >= 0) { //  speed input must only be between 0 to 255
-    if (Turn == true) {
+    if (Assigned_Speed == 1) {
       analogWrite(AnalogSpeedLeft, speed);
     }
-    if (Turn == false) {
+    if (Assigned_Speed == 0) {
     analogWrite(AnalogSpeedLeft, SpdLF);
     }  
   }
@@ -155,10 +155,10 @@ void Left_Reverse(int speed) {  //  Turn left motor in reverse direction
   digitalWrite(LeftMotorIN1, HIGH);
   digitalWrite(LeftMotorIN2, LOW);
   if (speed <= 255 && speed >= 0) { //  speed input must only be between 0 to 255
-    if (Turn == true) {
+    if (Assigned_Speed == 1) {
       analogWrite(AnalogSpeedLeft, speed);  
     }
-    if (Turn == false) {
+    if (Assigned_Speed == 0) {
       analogWrite(AnalogSpeedLeft, SpdLR);
     }
   }
@@ -169,10 +169,10 @@ void Right_Forward(int speed) { // Turn right motor in forward direction
   digitalWrite(RightMotorIN1, LOW);
   digitalWrite(RightMotorIN2, HIGH);
   if (speed <= 255 && speed >= 0) { //  speed input must only be between 0 to 255
-    if (Turn == true) {
+    if (Assigned_Speed == 1) {
       analogWrite(AnalogSpeedRight, speed);  
     }
-    if (Turn == false) {
+    if (Assigned_Speed == 0) {
       analogWrite(AnalogSpeedRight, SpdRF);
     }
   }
@@ -183,10 +183,10 @@ void Right_Reverse(int speed) { //  Turn right motor in reverse direction
   digitalWrite(RightMotorIN1, HIGH);
   digitalWrite(RightMotorIN2, LOW);
   if (speed <= 255 && speed >= 0){ //  speed input must only be between 0 to 255
-    if (Turn == true) {
+    if (Assigned_Speed == 1) {
       analogWrite(AnalogSpeedRight, speed); 
     }
-    if (Turn == false) {
+    if (Assigned_Speed == 0) {
       analogWrite(AnalogSpeedRight, SpdRR);
     }
   }
@@ -195,20 +195,20 @@ void Right_Reverse(int speed) { //  Turn right motor in reverse direction
 //----------------------------------------------------------------------------------For car movements-------------------------------------------------------------------------------------//
 
 void Forward() {  //  Car move in forward direction
-  Turn = false;
+  Assigned_Speed = 0;
   Left_Forward(SpdLF);
   Right_Forward(SpdRF);
 }
 
 void Reverse() {  //  Car move in reverse direction
-  Turn = false;
+  Assigned_Speed = 0;
   Left_Reverse(SpdLR);
   Right_Reverse(SpdRR);
 }
 
 void Rotate_Left(int speed) { // Car rotate to the left
   if (speed >= 0 && speed <= 255){ //  speed input must only be between 0 to 255
-    Turn = true;
+    Assigned_Speed = 1;
     Left_Reverse(speed);
     Right_Forward(speed);
   }
@@ -216,7 +216,7 @@ void Rotate_Left(int speed) { // Car rotate to the left
 
 void Rotate_Right(int speed) {  //  Car rotate to the right
   if (speed >= 0 && speed <= 255){ //  speed input must only be between 0 to 255
-    Turn = true;
+    Assigned_Speed = 1;
     Right_Reverse(speed);
     Left_Forward(speed);
   }
@@ -224,7 +224,7 @@ void Rotate_Right(int speed) {  //  Car rotate to the right
 
 void Forward_Turn(int Lspeed, int Rspeed) { // Car do a left/right turn in forward direction
   if (Lspeed >= 0 && Lspeed <= 255 && Rspeed >= 0 && Rspeed <= 255){ //  Lspeed & Rspeed input must only be between 0 to 255
-    Turn = true;
+    Assigned_Speed = 1;
     Left_Forward(Lspeed);
     Right_Forward(Rspeed);
   }
@@ -232,7 +232,7 @@ void Forward_Turn(int Lspeed, int Rspeed) { // Car do a left/right turn in forwa
 
 void Reverse_Turn(int Lspeed, int Rspeed) { //  Car do a left/right turn in reverse direction
   if (Lspeed >= 0 && Lspeed <= 255 && Rspeed >= 0 && Rspeed <= 255){ //  Lspeed & Rspeed input must only be between 0 to 255
-    Turn = true;
+    Assigned_Speed = 1;
     Left_Reverse(Lspeed);
     Right_Reverse(Rspeed);
   }
@@ -255,20 +255,21 @@ void Speed_Change(int accel) { //  Change the speed for forward and reverse moti
     SpdLR += accel;
     SpdRR += accel;
   }
-  A2A.print("LF Motor: ");
+  A2A.print("Forward Motors: ");
   A2A.print(SpdLF);
-  A2A.print("RF Motor: ");
+  A2A.print(" ");
   A2A.print(SpdRF);
-  A2A.print("LR Motor: ");
+  A2A.print(" | ");
+  A2A.print("Reverse Motors: ");
   A2A.print(SpdLR);
-  A2A.print("RR Motor: ");
+  A2A.print(" ");
   A2A.println(SpdRR);
-  command = Stop_Pressed;
+  command = 'S';
 }
 
 //-----------------------------------------------------------------------------For reset upon disconnection------------------------------------------------------------------------------------//
 
-void Reset() {  //  Reset all the variables and timer when bluetooth is disconnected
+void Disconnect() {  //  Reset all the variables and timer when bluetooth is disconnected
   SpdLF = 0;
   SpdLR = 0;
   SpdRF = 0;
@@ -280,19 +281,19 @@ void Reset() {  //  Reset all the variables and timer when bluetooth is disconne
   millisecond = 0;
   StationCounter = 1;
   timestarter = 0;
-  command = 'S';
-  Turn = false;
+  command = 'A';
+  Assigned_Speed = 1;
   TurnOn = 0;
   for (int i = 0; i < 14; i++){
     precode[i] = 0;
   }
   for (int i = 0; i <= 255; i++){
       analogWrite(LightOut, i);
-      delay(10);
+      delay(5);
   }
   for (int i = 255; i >= 0; i--){
       analogWrite(LightOut, i);
-      delay(10);
+      delay(5);
   }
 }
 
