@@ -2,7 +2,7 @@
 /*
 Command                   RFID                            Single Motor                       Car Movement                             Setting
 *Get_Command();           * Read_RFID();                  * Left_Forward(0 to 255);          * Forward();                             * Reset();
-*Armed_Disarmed();        * Time_Display();               * Right_Forward(0 to 255);         * Reverse();
+*Armed_Disarmed();        * Time_Display();               * Right_Forward(0 to 255);         * Reverse();                             * Setup();
                                                           * Left_Reverse(0 to 255);          * Rotate_Left(0 to 255);
                                                           * Right_Reverse(0 to 255);         * Rotate_Right(0 to 255);
                                                                                              * Forward_Turn(0 to 255, 0 to 255);
